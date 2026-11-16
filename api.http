@@ -1,0 +1,105 @@
+### ConectaDoa · Testes Manuais da API
+### Com a API rodando (vp run api), clique em "Send Request" acima de cada bloco.
+
+@api = http://localhost:3000/api
+
+### 1. Saúde da API e do banco
+GET {{api}}/health
+
+### 2. Listar todos os doadores
+GET {{api}}/doadores
+
+### 3. Buscar um doador existente por ID
+GET {{api}}/doadores/1
+
+### 4. Buscar doador que não existe (espera 404)
+GET {{api}}/doadores/999
+
+### 5. Cadastrar doador com sucesso (espera 201)
+POST {{api}}/doadores
+Content-Type: application/json
+
+{
+  "nome": "Beatriz Ramos",
+  "email": "beatriz@exemplo.com",
+  "telefone": "(11) 96666-1003"
+}
+
+### 6. Cadastrar sem nome obrigatório (espera 400)
+POST {{api}}/doadores
+Content-Type: application/json
+
+{
+  "email": "sem.nome@exemplo.com",
+  "telefone": "(11) 99999-0000"
+}
+
+### 7. Cadastrar com e-mail repetido (espera 409)
+POST {{api}}/doadores
+Content-Type: application/json
+
+{
+  "nome": "Beatriz Repetida",
+  "email": "beatriz@exemplo.com",
+  "telefone": "(11) 91111-2222"
+}
+
+### 8. Atualizar doador existente (espera 200)
+PUT {{api}}/doadores/3
+Content-Type: application/json
+
+{
+  "nome": "Carlos Lima Atualizado",
+  "email": "carlos.lima@exemplo.com",
+  "telefone": "(11) 97777-9999"
+}
+
+### 9. Atualizar doador inexistente (espera 404)
+PUT {{api}}/doadores/999
+Content-Type: application/json
+
+{
+  "nome": "Inexistente",
+  "email": "inexistente@exemplo.com",
+  "telefone": "(11) 90000-0000"
+}
+
+### 10. Tentar excluir doador com doações vinculadas (espera 409)
+DELETE {{api}}/doadores/1
+
+### 11. Excluir doador recém-criado sem doações (espera 204)
+### (Substitua pelo ID retornado no teste 5 se necessário)
+DELETE {{api}}/doadores/5
+
+### 12. Listar catálogo de itens com categorias
+GET {{api}}/itens
+
+### 13. Listar todas as doações (com doador e lista de itens agrupados)
+GET {{api}}/doacoes
+
+### 14. Registrar nova doação com itens em transação (espera 201)
+POST {{api}}/doacoes
+Content-Type: application/json
+
+{
+  "id_doador": 2,
+  "data_doacao": "2026-10-22",
+  "observacao": "Arrecadação da escola",
+  "itens": [
+    { "id_item": 1, "quantidade": 4 },
+    { "id_item": 4, "quantidade": 6 }
+  ]
+}
+
+### 15. Registrar doação com item inválido/inexistente (espera 400)
+POST {{api}}/doacoes
+Content-Type: application/json
+
+{
+  "id_doador": 2,
+  "data_doacao": "2026-10-22",
+  "observacao": "Teste com item inexistente",
+  "itens": [
+    { "id_item": 9999, "quantidade": 1 }
+  ]
+}
