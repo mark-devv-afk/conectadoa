@@ -2,18 +2,43 @@
 
 Projeto desenvolvido para a disciplina **Projeto Integrador Extensionista II (PIE II)** do curso de Análise e Desenvolvimento de Sistemas.
 
-O **ConectaDoa** é uma aplicação web para gestão e conexão de doações para organizações não-governamentais (ONGs), estruturada em arquitetura cliente-servidor em monólito simples.
+O **ConectaDoa** é uma aplicação web completa (Frontend SPA + API REST + Banco de Dados Relacional) para conexão e gestão de doações para organizações não-governamentais (ONGs), estruturada em monólito cliente-servidor em 3 camadas.
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-- **Frontend:** HTML5, CSS3, JavaScript (ES Modules) com [Vite+](https://vite.plus/)
+- **Frontend:** HTML5 Semântico, CSS3 (Mobile-First, Grid e Flexbox), JavaScript (ES Modules, SPA via hash `#`) com [Vite+](https://vite.plus/)
 - **Backend:** Node.js com [Express](https://expressjs.com/)
 - **Banco de Dados:** MySQL / MariaDB (via XAMPP ou instalação local)
 - **Driver de Conexão:** [mysql2](https://github.com/sidorares/node-mysql2) com Pool de Conexões e Promises
+- **Segurança:** Consultas parametrizadas com `?` (anti SQL injection) e renderização segura de texto via DOM (anti XSS)
 - **Variáveis de Ambiente:** [dotenv](https://github.com/motdotla/dotenv)
 - **Proxy:** Configurado via `vite.config.ts` encaminhando `/api` para a porta 3000
+
+---
+
+## 📱 Telas do MVP (Frontend SPA)
+
+A interface é uma Single Page Application leve que navega através do hash da URL, sem recarregar a página:
+
+1. **Doadores (`#/doadores`)**:
+   - Formulário de cadastro de novos doadores com campos validados (nome, e-mail e telefone).
+   - Listagem em cartões dos doadores cadastrados.
+   - Edição de doador com preenchimento automático do formulário.
+   - Exclusão com confirmação e tratamento de integridade referencial (bloqueio caso o doador possua doações).
+   - Layout responsivo: formulário e lista empilhados no celular, e lado a lado em telas largas (>= 960px).
+
+2. **Registrar Doação (`#/doacoes/nova`)**:
+   - Seleção do doador e data da doação (preenchida por padrão com a data atual via `hoje()`).
+   - Campo opcional de observação.
+   - Inclusão dinâmica de múltiplos itens com agrupamento por categorias em `<optgroup>`.
+   - Gravação atômica via transação no banco de dados.
+
+3. **Listagem de Doações (`#/doacoes`)**:
+   - Totalizador com número de doações registradas.
+   - Cartões com doador, data formatada (padrão brasileiro `DD/MM/AAAA`) e lista de itens doados com quantidades e unidades.
+   - Layout responsivo em grid com até 3 colunas em telas grandes.
 
 ---
 
@@ -30,15 +55,15 @@ O **ConectaDoa** é uma aplicação web para gestão e conexão de doações par
 
 Os scripts SQL estão organizados na pasta `database/`:
 
-- `database/schema.sql`: Criação das tabelas (`doador`, `categoria`, `item`, `doacao`, `doacao_item`) com chaves primárias, estrangeiras com `ON DELETE CASCADE`, regras de `CHECK`, `UNIQUE` e proteção contra dados nulos.
-- `database/seed.sql`: Carga de dados de exemplo para testes.
+- `database/schema.sql`: Estrutura das tabelas (`doador`, `categoria`, `item`, `doacao`, `doacao_item`) com chaves primárias, estrangeiras com `ON DELETE CASCADE`, regras de `CHECK`, `UNIQUE` e proteção contra dados nulos.
+- `database/seed.sql`: Carga inicial de dados de exemplo para testes.
 
-### Como importar no MySQL / XAMPP:
+### Como importar no MySQL / phpMyAdmin:
 
-1. Inicie o módulo **MySQL** no painel do XAMPP.
-2. Abra o phpMyAdmin em `http://localhost/phpmyadmin` ou cliente MySQL de sua preferência.
-3. Execute primeiro o script `database/schema.sql`.
-4. Em seguida, execute o script `database/seed.sql`.
+1. Inicie os módulos **Apache** e **MySQL** no painel de controle do XAMPP.
+2. Acesse o phpMyAdmin em `http://localhost/phpmyadmin`.
+3. Na aba **SQL**, execute o script `database/schema.sql`.
+4. Em seguida, na base criada, execute o script `database/seed.sql`.
 
 ---
 
@@ -125,7 +150,7 @@ O servidor de desenvolvimento iniciará em: **http://localhost:5173**
 | `GET`    | `/api/doacoes`      | Lista doações com dados do doador e itens        | 200 OK            |
 | `POST`   | `/api/doacoes`      | Registra doação com múltiplos itens em transação | 201 Created       |
 
-Testes manuais completos de todos os endpoints encontram-se no arquivo [`api.http`](file:///C:/Users/Balta/.gemini/antigravity/scratch/conectadoa/api.http) (compatível com a extensão REST Client do VS Code).
+Testes manuais completos de todos os endpoints encontram-se no arquivo [`api.http`](file:///C:/Users/Balta/.gemini/antigravity/scratch/conectadoa/api.http).
 
 ---
 
@@ -134,25 +159,30 @@ Testes manuais completos de todos os endpoints encontram-se no arquivo [`api.htt
 ```text
 conectadoa/
 ├── database/
-│   ├── schema.sql      # Estrutura do banco de dados (DDL)
-│   └── seed.sql        # Dados iniciais de teste (DML)
+│   ├── schema.sql        # Estrutura do banco de dados (DDL)
+│   └── seed.sql          # Dados iniciais de teste (DML)
 ├── server/
-│   ├── db.js           # Pool de conexões MySQL
-│   ├── index.js        # Inicialização do Express e middlewares
-│   ├── validacao.js    # Regras de validação de negócio
+│   ├── db.js             # Pool de conexões MySQL
+│   ├── index.js          # Inicialização do Express e middlewares
+│   ├── validacao.js      # Regras de validação de negócio no servidor
 │   └── routes/
-│       ├── doadores.js # Rotas de CRUD de doadores
-│       ├── itens.js    # Rota de catálogo de itens
-│       └── doacoes.js  # Rotas de doações com transação SQL
+│       ├── doadores.js   # CRUD de doadores
+│       ├── itens.js      # Catálogo de itens
+│       └── doacoes.js    # Rotas de doações com transação SQL
 ├── src/
-│   ├── main.js         # Código JavaScript do frontend
-│   └── style.css       # Estilos da aplicação
-├── .env.example        # Modelo de variáveis de ambiente
-├── .env                # Variáveis locais (ignorado no Git)
-├── .gitignore          # Arquivos ignorados pelo Git
-├── api.http            # Testes manuais de todos os endpoints
-├── index.html          # Documento HTML principal
-├── package.json        # Dependências e scripts
-├── vite.config.ts      # Configuração do Vite+ com proxy /api
-└── README.md           # Documentação do projeto
+│   ├── api.js            # Camada centralizada de chamadas à API (fetch)
+│   ├── main.js           # Roteamento SPA com hash
+│   ├── style.css         # Estilos mobile-first (Grid e Flexbox)
+│   ├── ui.js             # Funções de apoio (el seguro anti-XSS, datas, mensagens)
+│   └── pages/
+│       ├── doacoes.js    # Telas de cadastro e listagem de doações
+│       └── doadores.js   # Tela de gestão de doadores
+├── .env.example          # Modelo de variáveis de ambiente
+├── .env                  # Variáveis locais (ignorado no Git)
+├── .gitignore            # Arquivos ignorados pelo Git
+├── api.http              # Testes manuais de todos os endpoints
+├── index.html            # Estrutura fixa (header, nav, main, footer)
+├── package.json          # Dependências e scripts
+├── vite.config.ts        # Configuração do Vite+ com proxy /api -> porta 3000
+└── README.md             # Documentação do projeto
 ```
