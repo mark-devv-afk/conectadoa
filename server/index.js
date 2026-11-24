@@ -1,34 +1,41 @@
 import "dotenv/config";
 import express from "express";
 import db from "./db.js";
+import auth, { autenticar } from "./auth.js";
 import doadores from "./routes/doadores.js";
 import itens from "./routes/itens.js";
 import doacoes from "./routes/doacoes.js";
 
+if (!process.env.JWT_SECRET) {
+  console.error("Defina JWT_SECRET no arquivo .env");
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 
+// Rotas públicas
 app.get("/api/health", async (req, res) => {
-  let banco = "ok";
   try {
-    await db.query("SELECT 1");
+    await db.execute("SELECT 1");
+    res.json({ status: "ok", banco: "ok" });
   } catch {
-    banco = "sem conexão";
+    res.status(500).json({ status: "ok", banco: "erro" });
   }
-  res.json({ status: "ok", banco, app: "ConectaDoa", hora: new Date().toISOString() });
 });
 
+app.use("/api/auth", auth);
+
+// Daqui para baixo, toda rota exige token
+app.use("/api", autenticar);
 app.use("/api/doadores", doadores);
 app.use("/api/itens", itens);
 app.use("/api/doacoes", doacoes);
 
-// Tratamento final de erros: qualquer erro não tratado nas rotas chega aqui.
-app.use((erro, req, res, _next) => {
-  if (erro.type === "entity.parse.failed") {
-    return res.status(400).json({ erro: "JSON inválido no corpo da requisição" });
-  }
-  console.error(erro);
-  res.status(500).json({ erro: "Erro interno no servidor" });
+// Tratador de erros: qualquer erro não tratado vira 500
+app.use((err, req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ erro: "Erro interno do servidor" });
 });
 
 const PORT = process.env.PORT || 3000;
