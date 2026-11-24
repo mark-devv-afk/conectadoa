@@ -1,31 +1,62 @@
 import "./style.css";
-import { verificarSaude } from "./api.js";
+import { lerNomeUsuario, lerToken, sair } from "./api.js";
 import { telaDoacoes, telaNovaDoacao } from "./pages/doacoes.js";
 import { telaDoadores } from "./pages/doadores.js";
+import { telaLogin } from "./pages/login.js";
 
 const app = document.querySelector("#app");
 
-// Cada endereço depois do # mostra uma tela
-const rotas = {
-  "#/doadores": telaDoadores,
-  "#/doacoes/nova": telaNovaDoacao,
-  "#/doacoes": telaDoacoes,
-};
+function mostrarApp() {
+  app.innerHTML = `
+    <header class="topo">
+      <strong class="marca">ConectaDoa</strong>
+      <nav>
+        <button type="button" data-tela="doadores">Doadores</button>
+        <button type="button" data-tela="novaDoacao">Registrar doação</button>
+        <button type="button" data-tela="doacoes">Doações</button>
+      </nav>
+      <div class="usuario-area">
+        <span class="usuario"></span>
+        <button type="button" id="sair" class="secundario">Sair</button>
+      </div>
+    </header>
+    <div id="conteudo"></div>
+  `;
 
-function navegar() {
-  const rota = rotas[location.hash] ? location.hash : "#/doadores";
-  for (const link of document.querySelectorAll("nav a")) {
-    if (link.getAttribute("href") === rota) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
+  app.querySelector(".usuario").textContent = lerNomeUsuario() || "Voluntário";
+  const conteudo = app.querySelector("#conteudo");
+  const telas = {
+    doadores: telaDoadores,
+    novaDoacao: telaNovaDoacao,
+    doacoes: telaDoacoes,
+  };
+
+  for (const botao of app.querySelectorAll("nav button")) {
+    botao.onclick = () => {
+      for (const b of app.querySelectorAll("nav button")) {
+        b.removeAttribute("aria-current");
+      }
+      botao.setAttribute("aria-current", "page");
+      telas[botao.dataset.tela](conteudo);
+    };
   }
-  rotas[rota](app);
+
+  app.querySelector("#sair").onclick = () => {
+    sair();
+    iniciar();
+  };
+
+  const primeiroBotao = app.querySelector('nav button[data-tela="doadores"]');
+  if (primeiroBotao) primeiroBotao.setAttribute("aria-current", "page");
+  telaDoadores(conteudo);
 }
 
-window.addEventListener("hashchange", navegar);
-navegar();
+function iniciar() {
+  if (lerToken()) {
+    mostrarApp();
+  } else {
+    telaLogin(app, mostrarApp);
+  }
+}
 
-// Indicador no rodapé, herdado da Aula 1
-const statusApi = document.querySelector("#status-api");
-verificarSaude()
-  .then((saude) => (statusApi.textContent = `${saude.status}, banco: ${saude.banco}`))
-  .catch(() => (statusApi.textContent = "fora do ar"));
+iniciar();

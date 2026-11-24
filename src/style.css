@@ -49,6 +49,11 @@ h2 {
 .topo {
   background: var(--cor-primaria);
   padding: 12px var(--espaco);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .marca {
@@ -62,7 +67,68 @@ nav {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 16px;
-  margin-top: 8px;
+}
+
+nav button {
+  background: transparent;
+  border: none;
+  color: #cfdaea;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+nav button[aria-current="page"] {
+  color: #fff;
+  border-bottom: 2px solid #fff;
+  border-radius: 0;
+}
+
+nav button:hover {
+  color: #fff;
+}
+
+.usuario-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topo .usuario {
+  color: #cfdaea;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.topo button.secundario {
+  min-height: 36px;
+  padding: 4px 12px;
+  font-size: 0.875rem;
+}
+
+/* Tela de login */
+.login {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: var(--espaco);
+  text-align: center;
+}
+
+.login h1 {
+  font-size: 2rem;
+  color: var(--cor-primaria);
+  margin-bottom: 24px;
+}
+
+.login form {
+  text-align: left;
+}
+
+.login button {
+  width: 100%;
+  margin-top: 16px;
 }
 
 nav a {
