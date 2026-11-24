@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: ConectaDoa API
+  version: 1.0.0
+  description: API REST do ConectaDoa para o Projeto Integrador Extensionista II (MVP).
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor Local
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      summary: Saúde da API e do banco de dados
+      security: []
+      responses:
+        "200":
+          description: API operacional
+        "500":
+          description: Erro no servidor ou banco desconectado
+  /auth/login:
+    post:
+      summary: Confere e-mail e senha e devolve um token JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: Login aceito
+        "400":
+          description: E-mail ou senha não informados
+        "401":
+          description: E-mail ou senha inválidos
+  /doadores:
+    get:
+      summary: Lista todos os doadores
+      responses:
+        "200":
+          description: Lista de doadores
+        "401":
+          description: Não autorizado
+    post:
+      summary: Cadastra novo doador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Doador"
+      responses:
+        "201":
+          description: Doador criado
+        "400":
+          description: Dados inválidos
+        "401":
+          description: Não autorizado
+        "409":
+          description: Conflito de e-mail duplicado
+  /doadores/{id}:
+    get:
+      summary: Busca doador por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Doador encontrado
+        "401":
+          description: Não autorizado
+        "404":
+          description: Doador não encontrado
+    put:
+      summary: Atualiza doador por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Doador"
+      responses:
+        "200":
+          description: Doador atualizado
+        "400":
+          description: Dados inválidos
+        "401":
+          description: Não autorizado
+        "404":
+          description: Doador não encontrado
+        "409":
+          description: Conflito de e-mail duplicado
+    delete:
+      summary: Exclui doador por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Excluído com sucesso
+        "401":
+          description: Não autorizado
+        "404":
+          description: Doador não encontrado
+        "409":
+          description: Doador possui doações e não pode ser excluído
+  /itens:
+    get:
+      summary: Lista catálogo de itens e suas categorias
+      responses:
+        "200":
+          description: Catálogo de itens
+        "401":
+          description: Não autorizado
+  /doacoes:
+    get:
+      summary: Lista doações cadastradas com itens agrupados
+      responses:
+        "200":
+          description: Lista de doações
+        "401":
+          description: Não autorizado
+    post:
+      summary: Registra nova doação com itens em transação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NovaDoacao"
+      responses:
+        "201":
+          description: Doação registrada com sucesso
+        "400":
+          description: Dados inválidos ou itens inexistentes
+        "401":
+          description: Não autorizado
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Login:
+      type: object
+      required:
+        - email
+        - senha
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+    Doador:
+      type: object
+      required:
+        - nome
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        telefone:
+          type: string
+    NovaDoacao:
+      type: object
+      required:
+        - id_doador
+        - data_doacao
+        - itens
+      properties:
+        id_doador:
+          type: integer
+        data_doacao:
+          type: string
+          format: date
+        observacao:
+          type: string
+        itens:
+          type: array
+          items:
+            type: object
+            required:
+              - id_item
+              - quantidade
+            properties:
+              id_item:
+                type: integer
+              quantidade:
+                type: integer
