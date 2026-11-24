@@ -4,6 +4,13 @@
 SET NAMES utf8mb4;
 USE conectadoa;
 
+-- Usuário de demonstração
+-- e-mail: voluntario@exemplo.com senha: conectadoa123
+-- O banco guarda só o hash bcrypt da senha, nunca a senha.
+INSERT INTO usuario (nome, email, senha_hash) VALUES
+  ('Voluntário Demo', 'voluntario@exemplo.com',
+  '$2b$10$gwz8X12zwrcAoLG.L6MwNeJZ0levIEyMj8LpnGWUyHLGvf4BWF5ay');
+
 INSERT INTO categoria (nome) VALUES
   ('Alimento'),
   ('Higiene'),
