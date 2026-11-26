@@ -4,11 +4,9 @@
 
 | Campo | Valor |
 | :--- | :--- |
-| **Seu Nome Completo** | [SEU NOME COMPLETO AQUI] |
-| **ONG/Empresa** | ConectaDoa (Gestão de Doações para Comunidades e ONGs) |
+| **Seu Nome Completo** | Marcos Oliveira Santos Junior |
+| **ONG/Empresa** | ConectaDoa |
 | **Link do repositório** | https://github.com/mark-devv-afk/conectadoa |
-
-> **Nota:** Certifique-se de que o repositório no GitHub está configurado como **público** para que o avaliador consiga acessar sem necessidade de login.
 
 ---
 
@@ -18,7 +16,7 @@
 git clone https://github.com/mark-devv-afk/conectadoa.git && cd conectadoa
 vp install
 Copiar .env.example para .env e preencher DB_PASSWORD e JWT_SECRET
-No MySQL: executar database/schema.sql e database/seed.sql (ou rodar: node database/init.js)
+No MySQL: SOURCE database/schema.sql; e SOURCE database/seed.sql; (ou: node database/init.js)
 Terminal 1: vp run api
 Terminal 2: vp dev
 Abrir http://localhost:5173
@@ -37,8 +35,8 @@ Abrir http://localhost:5173
 
 | Funciona | Pendente |
 | :--- | :--- |
-| Login com autenticação JWT e botão Sair (logout com expiração de sessão) | Edição e exclusão de doações já registradas |
-| Cadastro, validação de campos e listagem de doadores | Mensagem visual mais amigável (toast/modal) quando o token expira |
-| Registro de doação com múltiplos itens em transação SQL atômica (`COMMIT`/`ROLLBACK`) | Filtro avançado e paginação na listagem de doações |
-| Rotas da API totalmente protegidas (HTTP 401 quando sem token ou token inválido) | Exportação de relatórios de doações em formato PDF/Excel |
-| Interface SPA responsiva (Mobile-First) com proteção contra XSS | Layout otimizado da tabela de itens de doações em telas muito pequenas |
+| Login com autenticação JWT e botão Sair (logout seguro) | Edição e exclusão de doações já registradas |
+| Cadastro, validação e listagem de doadores | Mensagem visual mais amigável (toast/modal) quando o token expira |
+| Registro de doação com múltiplos itens em transação atômica (`COMMIT`/`ROLLBACK`) | Filtro avançado e paginação na listagem de doações |
+| Rotas da API protegidas por token Bearer (retorno HTTP 401 sem token) | Exportação de relatórios de doações em formato PDF/Excel |
+| Interface SPA responsiva (Mobile-First) com proteção contra XSS | Layout otimizado da listagem de doações em telas muito pequenas |
